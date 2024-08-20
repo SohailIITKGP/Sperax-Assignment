@@ -37,11 +37,24 @@ const HistoricalData = () => {
 
   const handleFetchData = () => {
     if (token && startDate && endDate) {
-      const start = Math.floor(new Date(startDate).getTime() / 1000);
-      const end = Math.floor(new Date(endDate).getTime() / 1000);
-      fetchHistoricalData(token, start, end);
+      const start = new Date(startDate).getTime();
+      const end = new Date(endDate).getTime();
+
+      if (start > end) {
+        setError('Start Date cannot be after End Date.');
+        return;
+      }
+
+      if (start === end) {
+        setError('Start Date cannot be the same as End Date.');
+        return;
+      }
+
+      const startUnix = Math.floor(start / 1000);
+      const endUnix = Math.floor(end / 1000);
+      fetchHistoricalData(token, startUnix, endUnix);
     } else {
-      setError('Please enter a token and select date range.');
+      setError('Please enter a token and select a valid date range.');
     }
   };
 
@@ -83,24 +96,30 @@ const HistoricalData = () => {
           className="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:border-purple-500 focus:outline-none"
         />
         <div className="flex space-x-4">
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="w-1/2 p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:border-purple-500 focus:outline-none"
-          />
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="w-1/2 p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:border-purple-500 focus:outline-none"
-          />
+          <div className="flex flex-col w-1/2">
+            <label className="text-white">Start Date</label>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:border-purple-500 focus:outline-none"
+            />
+          </div>
+          <div className="flex flex-col w-1/2">
+            <label className="text-white">End Date</label>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="w-full p-3 rounded-md bg-gray-800 text-white border border-gray-700 focus:border-purple-500 focus:outline-none"
+            />
+          </div>
         </div>
         <div className="text-center">
           <button
             onClick={handleFetchData}
             disabled={loading}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-md shadow-md transition duration-200 disabled:opacity-50"
+            className="bg-[#2a6f97] hover:bg-[#ffb703] text-white font-bold py-3 px-6 rounded-md shadow-md transition duration-200 disabled:opacity-50"
           >
             {loading ? 'Fetching...' : 'Fetch Data'}
           </button>
